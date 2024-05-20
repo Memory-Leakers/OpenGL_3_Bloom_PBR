@@ -275,7 +275,7 @@ void Init(App* app)
 
     app->entities.push_back({ vec3(2.5, -1, 2.5), vec3(0.03), GoombaModelIndex, 0, 0 });
 
-    app->entities.push_back({ vec3(-2.5, -1.5, 2.5), vec3(2), ChestModelIndex, 0, 0 });
+    //app->entities.push_back({ vec3(-2.5, -1.5, 2.5), vec3(2), ChestModelIndex, 0, 0 });
 
     CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, -1.0), vec3(0.0, 0.0, 0.0) });
     CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 0.0, 1.0), vec3(-1.0, 1.0, -1.0), vec3(0.0, 0.0, 0.0) });
