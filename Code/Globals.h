@@ -165,11 +165,14 @@ struct Material
     vec3            albedo;
     vec3            emissive;
     f32             smoothness;
+    vec3            ao;
     u32             albedoTextureIdx;
     u32             emissiveTextureIdx;
     u32             specularTextureIdx;
     u32             normalsTextureIdx;
     u32             bumpTextureIdx;
+    u32             shininessTextureIdx;
+    u32             aoTextureIdx;
 };
 
 struct Buffer {
@@ -201,6 +204,7 @@ struct Light
     vec3 color;
     vec3 direction;
     vec3 position;
+    float intensity;
     bool selected;
     int sphere = -1;
 };

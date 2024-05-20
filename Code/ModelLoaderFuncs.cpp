@@ -35,6 +35,7 @@ namespace ModelLoader
 
         switch (image.nchannels)
         {
+        case 1: dataFormat = GL_RED; internalFormat = GL_RGB8; break;
         case 3: dataFormat = GL_RGB; internalFormat = GL_RGB8; break;
         case 4: dataFormat = GL_RGBA; internalFormat = GL_RGBA8; break;
         default: ELOG("LoadTexture2D() - Unsupported number of channels");
@@ -174,11 +175,13 @@ namespace ModelLoader
         aiColor3D emissiveColor;
         aiColor3D specularColor;
         ai_real shininess;
+        aiColor3D ao;
         material->Get(AI_MATKEY_NAME, name);
         material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
         material->Get(AI_MATKEY_COLOR_EMISSIVE, emissiveColor);
         material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
         material->Get(AI_MATKEY_SHININESS, shininess);
+        material->Get(AI_MATKEY_COLOR_AMBIENT, ao);
 
         myMaterial.name = name.C_Str();
         myMaterial.albedo = vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);
@@ -221,8 +224,20 @@ namespace ModelLoader
             String filepath = MakePath(directory, filename);
             myMaterial.bumpTextureIdx = LoadTexture2D(app, filepath.str);
         }
-
-        //myMaterial.createNormalFromBump();
+        if (material->GetTextureCount(aiTextureType_SHININESS) > 0)
+        {
+            material->GetTexture(aiTextureType_SHININESS, 0, &aiFilename);
+            String filename = MakeString(aiFilename.C_Str());
+            String filepath = MakePath(directory, filename);
+            myMaterial.shininessTextureIdx = LoadTexture2D(app, filepath.str);
+        }
+        if (material->GetTextureCount(aiTextureType_AMBIENT) > 0)
+        {
+            material->GetTexture(aiTextureType_AMBIENT, 0, &aiFilename);
+            String filename = MakeString(aiFilename.C_Str());
+            String filepath = MakePath(directory, filename);
+            myMaterial.aoTextureIdx = LoadTexture2D(app, filepath.str);
+        }
     }
 
     void ProcessAssimpNode(const aiScene* scene, aiNode* node, Mesh* myMesh, u32 baseMeshMaterialIndex, std::vector<u32>& submeshMaterialIndices)

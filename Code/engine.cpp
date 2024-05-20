@@ -248,11 +248,16 @@ void Init(App* app)
 
     const Program& texturedMeshProgram = app->programs[app->renderToBackBufferShader];
     app->texturedMeshProgram_uTexture = glGetUniformLocation(texturedMeshProgram.handle, "uTexture");
-    u32 PatrickModelIndex = ModelLoader::LoadModel(app, "Patrick/Patrick.obj");
-    u32 GroundModelIndex = ModelLoader::LoadModel(app, "./ground.obj");
-    u32 GoombaModelIndex = ModelLoader::LoadModel(app, "Goomba/goomba.obj");
+    app->texturedMeshProgram_uMetallic = glGetUniformLocation(texturedMeshProgram.handle, "uMetallic");
+    app->texturedMeshProgram_uRoughness = glGetUniformLocation(texturedMeshProgram.handle, "uRoughness");
+    app->texturedMeshProgram_uAO = glGetUniformLocation(texturedMeshProgram.handle, "uAO");
+    //u32 PatrickModelIndex = ModelLoader::LoadModel(app, "Patrick/Patrick.obj");
+    //u32 GroundModelIndex = ModelLoader::LoadModel(app, "./ground.obj");
+    //u32 GoombaModelIndex = ModelLoader::LoadModel(app, "Goomba/goomba.obj");
     app->SphereModelIndex = ModelLoader::LoadModel(app, "./sphere.obj");
-    u32 ChestModelIndex = ModelLoader::LoadModel(app, "Chest/Chest.obj");
+    //u32 ChestModelIndex = ModelLoader::LoadModel(app, "Chest/Chest.obj");
+
+    u32 CarModelIndex = ModelLoader::LoadModel(app, "Car/Car.obj");
 
     VertexBufferLayout vertexBufferLayout = {};
     vertexBufferLayout.attributes.push_back(VertexBufferAttribute{ 0, 3, 0 });
@@ -267,31 +272,46 @@ void Init(App* app)
 
     app->localUniformBuffer = CreateConstantBuffer(app->maxUniformBufferSize);
 
-    app->entities.push_back({ vec3(0.0, 0.0, 0.0), vec3(0.45), PatrickModelIndex, 0, 0});
-    app->entities.push_back({ vec3(2.35, 0.0, 0.0), vec3(0.45), PatrickModelIndex, 0, 0 });
-    app->entities.push_back({ vec3(-2.35, 0.0, 0.0), vec3(0.45), PatrickModelIndex, 0, 0 });
+    //app->entities.push_back({ vec3(0.0, 0.0, 0.0), vec3(0.45), PatrickModelIndex, 0, 0});
+    //app->entities.push_back({ vec3(2.35, 0.0, 0.0), vec3(0.45), PatrickModelIndex, 0, 0 });
+    //app->entities.push_back({ vec3(-2.35, 0.0, 0.0), vec3(0.45), PatrickModelIndex, 0, 0 });
+       
+    app->entities.push_back({ vec3(0.0, -1.0, 0.0), vec3(0.01), CarModelIndex, 0, 0 });
 
-    app->entities.push_back({ vec3(0, -1.55, 0.0), vec3(5, 5, 5), GroundModelIndex, 0, 0 });
+    //app->entities.push_back({ vec3(0, -1.55, 0.0), vec3(5, 5, 5), GroundModelIndex, 0, 0 });
 
-    app->entities.push_back({ vec3(2.5, -1, 2.5), vec3(0.03), GoombaModelIndex, 0, 0 });
+   // app->entities.push_back({ vec3(2.5, -1, 2.5), vec3(0.03), GoombaModelIndex, 0, 0 });
 
     //app->entities.push_back({ vec3(-2.5, -1.5, 2.5), vec3(2), ChestModelIndex, 0, 0 });
 
-    CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, -1.0), vec3(0.0, 0.0, 0.0) });
-    CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 0.0, 1.0), vec3(-1.0, 1.0, -1.0), vec3(0.0, 0.0, 0.0) });
-    CreateLight(app, { LightType::LightType_Point, vec3(1.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0), vec3(0.0, 3.0, 0.0) });
-    CreateLight(app, { LightType::LightType_Point, vec3(0.0, 1.0, 0.0), vec3(1.0, 1.0, 1.0), vec3(6.0, 0.0, 4.0) });
-    CreateLight(app, { LightType::LightType_Point, vec3(0.0, 0.0, 1.0), vec3(1.0, 1.0, 1.0), vec3(-6.0, 0.0, -1.0) });
+    CreateLight(app, { LightType::LightType_Directional, vec3(0.88, 0.67, 0.169), vec3(1.0, 0.0, -0.2), vec3(0.0, 0.0, 0.0), 5.0f });
+    //CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 0.0, 1.0), vec3(-1.0, 1.0, -1.0), vec3(0.0, 0.0, 0.0), 1.0f});
+    //CreateLight(app, { LightType::LightType_Point, vec3(1.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0), vec3(0.0, 3.0, 0.0), 1.0f });
+    //CreateLight(app, { LightType::LightType_Point, vec3(0.0, 1.0, 0.0), vec3(1.0, 1.0, 1.0), vec3(6.0, 0.0, 4.0), 1.0f });
+    CreateLight(app, { LightType::LightType_Point, vec3(0.05, 0.74, 0.97), vec3(1.0, 1.0, 1.0), vec3(3.0, 1.0, 1.0), 5.0f });
 
     app->ConfigureFrameBuffer(app->defferedFrameBuffer);
 
-    app->mode = Mode_Deferred;
+    app->mode = Mode_Forward;
 
     app->cam.Init(app->displaySize);
 }
 
 void Gui(App* app)
 {
+    ImGui::Begin("Others");
+
+    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Camera Position");
+    ImGui::DragFloat3("", &app->cam.position.x, 0.1f);
+    ImGui::Dummy(ImVec2(10, 10));
+    ImGui::DragFloat("Speed", &app->cam.cameraSpeed, 0.1f, 0.0f);
+    ImGui::Dummy(ImVec2(10, 10));
+    ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Direction");
+    ImGui::Text("(%.3f, %.3f, %.3f)", app->cam.direction.x, app->cam.direction.y, app->cam.direction.z);
+
+
+    ImGui::End();
+
     ImGui::Begin("Info");
     ImGui::Text("FPS: %f", 1.0f / app->deltaTime);
     ImGui::Text("%s", app->openglDebugInfo.c_str());
@@ -366,14 +386,15 @@ void Gui(App* app)
             ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), auxSelectedName.c_str());
             ImGui::Spacing();
 
-            if (ImGui::DragFloat3("Position", &app->lights[auxIndex].position.x))
+            if (ImGui::DragFloat3("Position", &app->lights[auxIndex].position.x, 0.1f))
             {
                 if (app->lights[auxIndex].sphere != -1)
                 {
                     app->entities[app->lights[auxIndex].sphere].position = app->lights[auxIndex].position;
                 }
             }
-            ImGui::DragFloat3("Direction", &app->lights[auxIndex].direction.x);
+            ImGui::DragFloat3("Direction", &app->lights[auxIndex].direction.x, 0.1f, -1.0f, 1.0f);
+            ImGui::DragFloat("Intensity", &app->lights[auxIndex].intensity);
             ImGui::ColorPicker3("Color", &app->lights[auxIndex].color.x);
         }
     }
@@ -384,7 +405,7 @@ void Gui(App* app)
 void Update(App* app)
 {
     // CAMERA MOVEMENT
-    float cameraSpeed = 2.5f * app->deltaTime;
+    float cameraSpeed = app->cam.cameraSpeed * app->deltaTime;
     if (app->input.keys[K_W] == BUTTON_PRESSED)
     {
         app->cam.position += cameraSpeed * app->cam.front;
@@ -540,8 +561,11 @@ void App::UpdateEntityBuffer()
         Light& light = lights[i];
         PushUInt(localUniformBuffer, light.type);
         PushVec3(localUniformBuffer, light.color);
-        PushVec3(localUniformBuffer, light.direction);
-        PushVec3(localUniformBuffer, light.position);
+        
+            PushVec3(localUniformBuffer, light.direction);
+            PushVec3(localUniformBuffer, light.position);
+
+        PushFloat(localUniformBuffer, light.intensity);
     }
     globalParamsSize = localUniformBuffer.head - globalParamsOffset;
 
@@ -622,9 +646,25 @@ void App::RenderGeometry(const Program aBindedProgram)
             u32 subMeshmaterialIdx = model.materialIdx[i];
             Material& subMeshMaterial = materials[subMeshmaterialIdx];
 
+            // Albedo
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.albedoTextureIdx].handle);
             glUniform1i(texturedMeshProgram_uTexture, 0);
+
+            // Metallic
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.specularTextureIdx].handle);
+            glUniform1i(texturedMeshProgram_uMetallic, 0);
+
+            // Roughness
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.shininessTextureIdx].handle);
+            glUniform1i(texturedMeshProgram_uRoughness, 0);
+
+            // AO
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.aoTextureIdx].handle);
+            glUniform1i(texturedMeshProgram_uAO, 0);
 
             SubMesh& submesh = mesh.submeshes[i];
             glDrawElements(GL_TRIANGLES, submesh.indices.size(), GL_UNSIGNED_INT, (void*)(u64)submesh.indexOffset);
@@ -654,11 +694,13 @@ const GLuint App::CreateTexture(const bool isFloatingPoint)
 
 void Camera::Init(ivec2 displaySize)
 {
+    cameraSpeed = 2.5f;
     aspectRatio = (float)displaySize.x / (float)displaySize.y;
     projection = glm::perspective(glm::radians(60.0f), aspectRatio, zNear, zFar);
-
     front = glm::vec3(0.0f, 0.0f, -1.0f);
     up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    direction = glm::vec3(0.562, -0.358, -0.746);
 }
 
 void Camera::Move()

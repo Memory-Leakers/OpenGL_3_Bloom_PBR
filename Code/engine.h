@@ -24,12 +24,13 @@ const u16 indices[] =
 
 struct Camera
 {
+    float cameraSpeed;
     float aspectRatio;
     float zNear = 0.1f;
     float zFar = 1000.0f;
     glm::mat4 projection;
 
-    vec3 position = vec3(0.0f, 1.0f, 10.0f);
+    vec3 position = vec3(-2.195, 1.108, 3.273);
     vec3 direction;
 
     glm::mat4 view;
@@ -91,6 +92,9 @@ struct App
 
     //u32 patricioModel = 0;
     GLuint texturedMeshProgram_uTexture;
+    GLuint texturedMeshProgram_uMetallic;
+    GLuint texturedMeshProgram_uRoughness;
+    GLuint texturedMeshProgram_uAO;
 
     // texture indices
     u32 diceTexIdx;

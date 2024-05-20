@@ -1,0 +1,80 @@
+# Blender 4.1.1 MTL File: 'Car.blend'
+# www.blender.org
+
+newmtl mat_body
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd VAZ2101_Body_BaseColor.png
+map_Pm VAZ2101_Body_Metallic.png
+map_Pr VAZ2101_Body_Roughness.png
+map_Bump VAZ2101_Body_Normal.png
+map_Ka VAZ2101_Body_AO.png
+map_Ke VAZ2101_Body_Emissive.png
+
+newmtl mat_glass
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Pr 0.500000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd VAZ2101_Glass_BaseColor.png
+map_Pm VAZ2101_Glass_Metallic.png
+map_Pr VAZ2101_Glass_Roughness.png
+map_Bump VAZ2101_Glass_Normal.png
+map_Ka VAZ2101_Glass_AO.png
+
+newmtl mat_interior
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Pr 0.500000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd VAZ2101_Interior_BaseColor.png
+map_Pm VAZ2101_Interior_Metallic.png
+map_Pr VAZ2101_Interior_Roughness.png
+map_Bump VAZ2101_Interior_Normal.png
+map_Ka VAZ2101_Interior_AO.png
+
+newmtl mat_wheel
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+Pr 0.500000
+Pm 0.000000
+Ps 0.000000
+Pc 0.000000
+Pcr 0.030000
+aniso 0.000000
+anisor 0.000000
+map_Kd Wheel_195_50R13x10_BaseColor.png
+map_Pm Wheel_195_50R13x10_Metallic.png
+map_Pr Wheel_195_50R13x10_Roughness.png
+map_Bump Wheel_195_50R13x10_Normal.png
+map_Ka Wheel_195_50R13x10_AO.png
