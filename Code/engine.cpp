@@ -251,6 +251,9 @@ void Init(App* app)
     app->texturedMeshProgram_uMetallic = glGetUniformLocation(texturedMeshProgram.handle, "uMetallic");
     app->texturedMeshProgram_uRoughness = glGetUniformLocation(texturedMeshProgram.handle, "uRoughness");
     app->texturedMeshProgram_uAO = glGetUniformLocation(texturedMeshProgram.handle, "uAO");
+    app->texturedMeshProgram_uNormal = glGetUniformLocation(texturedMeshProgram.handle, "uNormal");
+    app->texturedMeshProgram_uEmissive = glGetUniformLocation(texturedMeshProgram.handle, "uEmissive");
+
     //u32 PatrickModelIndex = ModelLoader::LoadModel(app, "Patrick/Patrick.obj");
     //u32 GroundModelIndex = ModelLoader::LoadModel(app, "./ground.obj");
     //u32 GoombaModelIndex = ModelLoader::LoadModel(app, "Goomba/goomba.obj");
@@ -654,17 +657,33 @@ void App::RenderGeometry(const Program aBindedProgram)
             // Metallic
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.specularTextureIdx].handle);
-            glUniform1i(texturedMeshProgram_uMetallic, 0);
+            glUniform1i(texturedMeshProgram_uMetallic, 1);
 
             // Roughness
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.shininessTextureIdx].handle);
-            glUniform1i(texturedMeshProgram_uRoughness, 0);
+            glUniform1i(texturedMeshProgram_uRoughness, 2);
 
             // AO
             glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.aoTextureIdx].handle);
-            glUniform1i(texturedMeshProgram_uAO, 0);
+            glUniform1i(texturedMeshProgram_uAO, 3);
+
+            // Normal
+            glActiveTexture(GL_TEXTURE4);
+            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.bumpTextureIdx].handle);
+            glUniform1i(texturedMeshProgram_uNormal, 4);
+
+
+            // Turn On/Off emissive
+            bool useEmissive = subMeshMaterial.emissiveTextureIdx != 0 ? 1 : 0;
+            glUniform1i(glGetUniformLocation(aBindedProgram.handle, "useEmissive"), useEmissive);
+
+            // Emissive
+            glActiveTexture(GL_TEXTURE5);
+            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.emissiveTextureIdx].handle);
+            glUniform1i(texturedMeshProgram_uEmissive, 5);
+
 
             SubMesh& submesh = mesh.submeshes[i];
             glDrawElements(GL_TRIANGLES, submesh.indices.size(), GL_UNSIGNED_INT, (void*)(u64)submesh.indexOffset);

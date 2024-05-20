@@ -4,6 +4,8 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 
+
+#include <iostream>
 namespace ModelLoader
 {
     Image LoadImage(const char* filename)
@@ -63,6 +65,8 @@ namespace ModelLoader
                 return texIdx;
 
         Image image = LoadImage(filepath);
+
+        std::cout << filepath << std::endl;
 
         if (image.pixels)
         {
@@ -176,12 +180,13 @@ namespace ModelLoader
         aiColor3D specularColor;
         ai_real shininess;
         aiColor3D ao;
+
         material->Get(AI_MATKEY_NAME, name);
         material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
         material->Get(AI_MATKEY_COLOR_EMISSIVE, emissiveColor);
         material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
         material->Get(AI_MATKEY_SHININESS, shininess);
-        material->Get(AI_MATKEY_COLOR_AMBIENT, ao);
+        material->Get(AI_MATKEY_COLOR_REFLECTIVE, ao);
 
         myMaterial.name = name.C_Str();
         myMaterial.albedo = vec3(diffuseColor.r, diffuseColor.g, diffuseColor.b);

@@ -95,6 +95,8 @@ struct App
     GLuint texturedMeshProgram_uMetallic;
     GLuint texturedMeshProgram_uRoughness;
     GLuint texturedMeshProgram_uAO;
+    GLuint texturedMeshProgram_uNormal;
+    GLuint texturedMeshProgram_uEmissive;
 
     // texture indices
     u32 diceTexIdx;

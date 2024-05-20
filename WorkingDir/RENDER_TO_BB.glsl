@@ -74,17 +74,23 @@ in vec3 vPosition; // World Position
 in vec3 vNormal; // Normal
 in vec3 vViewDir; // View Direction // Camera Position
 
+uniform bool useEmissive;
+
 // Samplers
 uniform sampler2D uTexture; // Albedo sampler
 uniform sampler2D uMetallic; // Metallic sampler
 uniform sampler2D uRoughness; // Roughness sampler
 uniform sampler2D uAO; // Ambient Occlusion sampler
+uniform sampler2D uNormal; // Normal sampler
+uniform sampler2D uEmissive; // Emissive sampler
 
 // Material parameters
 vec3 albedo;
 float metallic;
 float roughness;
 float ao;
+vec3 normal;
+vec3 emissive;
 
 // Lightning Calculation methods
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -135,13 +141,15 @@ void SamplerAllTextures()
 	metallic = texture(uMetallic, vTexCoord).r;
     roughness = texture(uRoughness, vTexCoord).r;
     ao = texture(uAO, vTexCoord).r;
+	normal = texture(uNormal, vTexCoord).rgb;
+	emissive = texture(uEmissive, vTexCoord).rgb;
 }
 
 void main()
 {
 	SamplerAllTextures();
 
-	vec3 N = normalize(vNormal);
+	vec3 N = normalize(normal); //vNormal
 	vec3 V = normalize(vViewDir - vPosition); // Podria estar malament
 
 	vec3 F0 = vec3(0.04);
@@ -166,7 +174,7 @@ void main()
             L = normalize(uLight[i].position - vPosition);
             float distance = length(uLight[i].position - vPosition);
             float attenuation = 1.0 / (distance * distance);
-            radiance = uLight[i].color * uLight[i].intensity * attenuation;
+            radiance = uLight[i].color * (uLight[i].intensity * attenuation);
         }
         
         vec3 H = normalize(V + L);
@@ -189,11 +197,18 @@ void main()
 
 	vec3 ambient = vec3(0.03) * albedo * ao;
 	vec3 color = ambient + Lo;
+	
+	if (useEmissive)
+	{
+		color += emissive;
+	}
+	
+	
 
 	color = color / (color + vec3(1.0));
 	color = pow(color, vec3(1.0/2.2));
 
-	oColor = vec4(color, 1.0);
+	oColor = vec4(color, 1.0);	
 }
 
 #endif
