@@ -24,6 +24,7 @@ struct Light
 	vec3 color;
 	vec3 direction;
 	vec3 position;
+	float intensity;
 };
 
 layout(binding = 0, std140) uniform GlobalParams
@@ -41,94 +42,214 @@ uniform sampler2D uPosition;
 uniform sampler2D uViewDir;
 uniform sampler2D uDepth;
 
+layout(location = 0) out vec4 oColor;
+
+const float PI = 3.14159265359;
+
+uniform bool useEmissive;
+
+// Samplers
+uniform sampler2D uMetallic; // Metallic sampler
+uniform sampler2D uRoughness; // Roughness sampler
+uniform sampler2D uAO; // Ambient Occlusion sampler
+uniform sampler2D uNormal; // Normal sampler
+uniform sampler2D uEmissive; // Emissive sampler
+
+// Material parameters
+vec3 albedo;
+float metallic;
+float roughness;
+float ao;
+vec3 normal;
+vec3 emissive;
+
+vec3 vPosition;
+vec3 vNormal;
+vec3 vViewDir;
+float vDepth;
+
 uniform bool showAlbedo;
 uniform bool showNormals;
 uniform bool showPosition;
 uniform bool showViewDir;
 uniform bool showDepth;
+uniform bool showMetallic;
+uniform bool showRoughness;
+uniform bool showAo;
+uniform bool showEmissive;
 
-layout(location = 0) out vec4 oColor;
-
-void CalculateBlitVars(in Light light, out vec3 ambient, out vec3 diffuse, out vec3 specular)
+// Lightning Calculation methods
+float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
-	vec3 vNormal = texture(uNormals, vTexCoord).xyz;
-	vec3 vViewDir = texture(uViewDir, vTexCoord).xyz;
-	vec3 lightDir = normalize(light.direction);
+	float a = roughness * roughness;
+	float a2 = a * a;
 
-	float ambientStrength = 0.2;
-	ambient = ambientStrength * light.color;
+	float NdotH = max(dot(N, H), 0.0);
+	float NdotH2 = NdotH * NdotH;
+	
+	float num = a2;
+	float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+	denom = PI * denom * denom;
 
-	float diff = max(dot(vNormal, lightDir), 0.0f);
-	diffuse = diff * light.color;
+	return num / denom;
+}
 
-	float specularStrength = 0.1f;
-	vec3 reflectDir = reflect(-lightDir, vNormal);
-	vec3 normalViewDir = normalize(vViewDir);
-	float spec = pow(max(dot(normalViewDir, reflectDir), 0.0f), 32);
-	specular = specularStrength * spec * light.color;
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+	float r = (roughness + 1.0);
+	float k = (r * r) / 8.0;
+
+	float num = NdotV;
+	float denom = NdotV * (1.0 - k) + k;
+
+	return num / denom;
+}
+
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+	float NdotV = max(dot(N, V), 0.0);
+	float NdotL = max(dot(N, L), 0.0);
+
+	float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+	float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+
+	return ggx1 * ggx2;
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+	return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+void SamplerAllTextures()
+{
+	albedo = texture(uAlbedo, vTexCoord).rgb;
+	metallic = texture(uMetallic, vTexCoord).r;
+    roughness = texture(uRoughness, vTexCoord).r;
+    ao = texture(uAO, vTexCoord).r;
+	normal = texture(uNormal, vTexCoord).rgb; //texture normal
+	emissive = texture(uEmissive, vTexCoord).rgb;
+
+	vPosition = texture(uPosition, vTexCoord).rgb;
+	vNormal = texture(uNormals, vTexCoord).rgb; // Normal normal
+	vViewDir = texture(uViewDir, vTexCoord).rgb;
+	vDepth = texture(uDepth, vTexCoord).r;
+}
+
+bool SamplerFilter()
+{
+	if (showAlbedo == true || showDepth == true || showNormals == true || 
+	showPosition == true || showViewDir == true || showMetallic == true ||
+	showRoughness == true || showAo == true || showEmissive == true)
+	{
+		if (showAlbedo)
+		{
+			oColor = vec4(albedo, 1.0);
+		}
+		else if (showNormals)
+		{
+			oColor = vec4(vNormal, 1.0);
+		}
+		else if (showPosition)
+		{
+			oColor = vec4(vPosition, 1.0);
+		}
+		else if (showViewDir)
+		{
+			oColor = vec4(vViewDir, 1.0);
+		}
+		else if (showDepth)
+		{
+			oColor = vec4(vec3(vDepth), 1.0);
+		}
+		else if (showMetallic)
+		{
+			oColor = vec4(vec3(metallic), 1.0f);
+		}
+		else if (showRoughness)
+		{
+			oColor = vec4(vec3(roughness), 1.0f);
+		}
+		else if (showAo)
+		{
+			oColor = vec4(vec3(ao), 1.0f);
+		}
+		else if (showEmissive)
+		{
+			oColor = vec4(emissive, 1.0f);
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 void main()
 {
-	vec4 textureColor = texture(uAlbedo, vTexCoord);
-	vec4 finalColor = vec4(0.0f);
-	for (int i = 0; i < uLightCount; ++i)
+	SamplerAllTextures();
+
+	if (SamplerFilter() == false)
 	{
-		vec3 lightResult = vec3(0.0f);
+		vec3 N = normalize(vNormal); //vNormal
+		vec3 V = normalize(vViewDir - vPosition); // Podria estar malament
 
-		vec3 ambient = vec3(0.0f);
-		vec3 diffuse = vec3(0.0f);
-		vec3 specular = vec3(0.0f);
+		vec3 F0 = vec3(0.04);
+		F0 = mix(F0, albedo, metallic);
 
-		if (uLight[i].type == 0)
+		//Reflectance equation
+		vec3 Lo = vec3(0.0);
+		for (int i = 0; i < uLightCount; ++i)
 		{
-			Light light = uLight[i];
+			vec3 L = vec3(0.0); 
+			vec3 radiance = vec3(0.0); 
 
-			CalculateBlitVars(light, ambient, diffuse, specular);
+			if (uLight[i].type == 0)
+			{
+				// Directional light
+				L = normalize(-uLight[i].direction);
+				radiance = uLight[i].color * uLight[i].intensity;
+			} 
+			else 
+			{
+				// Point light
+				L = normalize(uLight[i].position - vPosition);
+				float distance = length(uLight[i].position - vPosition);
+				float attenuation = 1.0 / (distance * distance);
+				radiance = uLight[i].color * (uLight[i].intensity * attenuation);
+			}
+			
+			vec3 H = normalize(V + L);
 
-			lightResult = ambient + diffuse + specular;
-			finalColor += vec4(lightResult, 1.0) * textureColor;
+			float NDF = DistributionGGX(N, H, roughness);
+			float G = GeometrySmith(N, V, L, roughness);
+			vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+			vec3 kS = F;
+			vec3 kD = vec3(1.0) - kS;
+			kD *= 1.0 - metallic;
+
+			vec3 numerator = NDF * G * F;
+			float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+			vec3 specular = numerator / denominator;
+
+			float NdotL = max(dot(N, L), 0.0);
+			Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+			
 		}
-		else
+
+		vec3 ambient = vec3(0.03) * albedo * ao;
+		vec3 color = ambient + Lo;
+		
+		if (useEmissive)
 		{
-			Light light = uLight[i];
-
-			float constant = 1.0f;
-			float linear = 0.09f;
-			float quadratic = 0.032f;
-			float distance = length(light.position - texture(uPosition, vTexCoord).xyz);
-			float attenuation = 1.0f / (constant + linear * distance + quadratic * (distance*distance));
-
-			CalculateBlitVars(light, ambient, diffuse, specular);
-			lightResult = (ambient * attenuation) + (diffuse * attenuation) + (specular * attenuation);
-			finalColor += vec4(lightResult, 1.0) * textureColor;
+			color += emissive;
 		}
-	}
 
+		color = color / (color + vec3(1.0));
+		color = pow(color, vec3(1.0/2.2));
 
-	if (showAlbedo)
-	{
-		oColor = texture(uAlbedo, vTexCoord);
-	}
-	else if (showNormals)
-	{
-		oColor = texture(uNormals, vTexCoord);
-	}
-	else if (showPosition)
-	{
-		oColor = texture(uPosition, vTexCoord);
-	}
-	else if (showViewDir)
-	{
-		oColor = texture(uViewDir, vTexCoord);
-	}
-	else if (showDepth)
-	{
-		oColor = vec4(texture(uDepth, vTexCoord));
-	}
-	else
-	{
-		oColor = finalColor;
+		oColor =  vec4(albedo, 1.0);;
 	}
 }
 

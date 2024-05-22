@@ -144,6 +144,10 @@ enum Mode
     Mode_Position,
     Mode_ViewDirection,
     Mode_Depth,
+    Mode_Metallic,
+    Mode_Roughness,
+    Mode_Ao,
+    Mode_Emissive,
     Mode_Count,
 };
 

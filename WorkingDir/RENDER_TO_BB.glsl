@@ -149,11 +149,11 @@ void main()
 {
 	SamplerAllTextures();
 
-	vec3 N = normalize(normal); //vNormal
+	vec3 N = normalize(vNormal); //vNormal
 	vec3 V = normalize(vViewDir - vPosition); // Podria estar malament
 
 	vec3 F0 = vec3(0.04);
-	F0 = mix(F0, albedo, metallic);
+	F0 = mix(F0, albedo.rgb, metallic);
 
 	//Reflectance equation
 	vec3 Lo = vec3(0.0);
@@ -202,13 +202,11 @@ void main()
 	{
 		color += emissive;
 	}
-	
-	
 
 	color = color / (color + vec3(1.0));
 	color = pow(color, vec3(1.0/2.2));
 
-	oColor = vec4(color, 1.0);	
+	oColor = vec4(emissive, 1.0f);	
 }
 
 #endif

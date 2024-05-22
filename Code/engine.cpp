@@ -295,7 +295,7 @@ void Init(App* app)
 
     app->ConfigureFrameBuffer(app->defferedFrameBuffer);
 
-    app->mode = Mode_Forward;
+    app->mode = Mode_Deferred;
 
     app->cam.Init(app->displaySize);
 }
@@ -319,7 +319,7 @@ void Gui(App* app)
     ImGui::Text("FPS: %f", 1.0f / app->deltaTime);
     ImGui::Text("%s", app->openglDebugInfo.c_str());
 
-    const char* RenderModes[] = {"FORWARD", "DEFERRED", "ALBEDO", "NORMALS", "POSITION", "VIEW DIRECTION", "DEPTH"};
+    const char* RenderModes[] = {"FORWARD", "DEFERRED", "ALBEDO", "NORMALS", "POSITION", "VIEW DIRECTION", "DEPTH", "METALLIC", "ROUGHNESS", "AMBIENT OCCLUSSION", "EMISSIVE"};
     if (ImGui::BeginCombo("Render Mode", RenderModes[app->mode]))
     {
         for (size_t i = 0; i < ARRAY_COUNT(RenderModes); ++i)
@@ -471,6 +471,10 @@ void Render(App* app)
         case  Mode_Position:
         case  Mode_Depth:
         case  Mode_ViewDirection:
+        case  Mode_Metallic:
+        case  Mode_Roughness:
+        case  Mode_Ao:
+        case  Mode_Emissive:
             {
                 //Render to FB ColorAtt.
                 glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -498,7 +502,7 @@ void Render(App* app)
                 glBindBufferRange(GL_UNIFORM_BUFFER, BINDING(0), app->localUniformBuffer.handle, app->globalParamsOffset, app->globalParamsSize);
                 
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.colorAttachment[0]);
+                glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.colorAttachment[1]);
                 glUniform1i(glGetUniformLocation(FBToBB.handle, "uAlbedo"), 0);
 
                 glActiveTexture(GL_TEXTURE1);
@@ -513,15 +517,41 @@ void Render(App* app)
                 glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.colorAttachment[3]);
                 glUniform1i(glGetUniformLocation(FBToBB.handle, "uViewDir"), 3);
 
+                // Metallic
                 glActiveTexture(GL_TEXTURE4);
+                glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.colorAttachment[4]);
+                glUniform1i(glGetUniformLocation(FBToBB.handle, "uMetallic"), 4);
+
+                // Roughness
+                glActiveTexture(GL_TEXTURE5);
+                glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.colorAttachment[5]);
+                glUniform1i(glGetUniformLocation(FBToBB.handle, "uRoughness"), 5);
+
+                // AO
+                glActiveTexture(GL_TEXTURE6);
+                glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.colorAttachment[6]);
+                glUniform1i(glGetUniformLocation(FBToBB.handle, "uAo"), 6);
+
+                // Emissive
+                glActiveTexture(GL_TEXTURE7);
+                glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.colorAttachment[7]);
+                glUniform1i(glGetUniformLocation(FBToBB.handle, "uEmissive"), 7);
+
+                // Depth
+                glActiveTexture(GL_TEXTURE8);
                 glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.depthHandle);
-                glUniform1i(glGetUniformLocation(FBToBB.handle, "uDepth"), 4);
+                glUniform1i(glGetUniformLocation(FBToBB.handle, "uDepth"), 8);
 
                 glUniform1i(glGetUniformLocation(FBToBB.handle, "showAlbedo"), app->mode == Mode_Albedo ? 1 : 0);
                 glUniform1i(glGetUniformLocation(FBToBB.handle, "showNormals"), app->mode == Mode_Normals ? 1 : 0);
                 glUniform1i(glGetUniformLocation(FBToBB.handle, "showPosition"), app->mode == Mode_Position ? 1 : 0);
                 glUniform1i(glGetUniformLocation(FBToBB.handle, "showViewDir"), app->mode == Mode_ViewDirection ? 1 : 0);
                 glUniform1i(glGetUniformLocation(FBToBB.handle, "showDepth"), app->mode == Mode_Depth ? 1 : 0);
+
+                glUniform1i(glGetUniformLocation(FBToBB.handle, "showMetallic"), app->mode == Mode_Metallic ? 1 : 0);
+                glUniform1i(glGetUniformLocation(FBToBB.handle, "showRoughness"), app->mode == Mode_Roughness ? 1 : 0);
+                glUniform1i(glGetUniformLocation(FBToBB.handle, "showAo"), app->mode == Mode_Ao ? 1 : 0);
+                glUniform1i(glGetUniformLocation(FBToBB.handle, "showEmissive"), app->mode == Mode_Emissive ? 1 : 0);
 
                 glBindVertexArray(app->vao);
                 glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
@@ -537,20 +567,6 @@ void Render(App* app)
 
 void App::UpdateEntityBuffer()
 {
-    //float aspectRatio = (float)displaySize.x / (float)displaySize.y;
-    //float znear = 0.1f;
-    //float zfar = 1000.0f;
-    //glm::mat4 projection = glm::perspective(glm::radians(60.0f), aspectRatio, znear, zfar);
-
-    //vec3 target = vec3(0.0f, 0.0f, 0.0f);
-    //vec3 cameraPosition = vec3(5.0f, 5.0f, 5.0f);
-
-    //vec3 zCam = glm::normalize(cameraPosition - target);
-    //vec3 xCam = glm::cross(zCam, vec3(0.0f, 1.0f, 0.0f));
-    //vec3 yCam = glm::cross(xCam, zCam);
-
-    //glm::mat4 view = glm::lookAt(cameraPosition, target, yCam);
-
     BufferManager::MapBuffer(localUniformBuffer, GL_WRITE_ONLY);
 
     PushVec3(localUniformBuffer, cam.position);
@@ -598,6 +614,10 @@ void App::ConfigureFrameBuffer(FrameBuffer& aConfigFB)
     aConfigFB.colorAttachment.push_back(CreateTexture(true));
     aConfigFB.colorAttachment.push_back(CreateTexture(true));
 
+    aConfigFB.colorAttachment.push_back(CreateTexture(true)); // oMetallic
+    aConfigFB.colorAttachment.push_back(CreateTexture(true)); // oRoughness
+    aConfigFB.colorAttachment.push_back(CreateTexture(true)); // oAo
+    aConfigFB.colorAttachment.push_back(CreateTexture(true)); // oEmissive
     
     glGenTextures(1, &aConfigFB.depthHandle);
     glBindTexture(GL_TEXTURE_2D, aConfigFB.depthHandle);
@@ -668,6 +688,9 @@ void App::RenderGeometry(const Program aBindedProgram)
             glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.aoTextureIdx].handle);
             glUniform1i(texturedMeshProgram_uAO, 3);
+
+            bool useNormalTexture = subMeshMaterial.normalsTextureIdx != 0 ? 1 : 0;
+            glUniform1i(glGetUniformLocation(aBindedProgram.handle, "useNormalTexture"), useNormalTexture);
 
             // Normal
             glActiveTexture(GL_TEXTURE4);

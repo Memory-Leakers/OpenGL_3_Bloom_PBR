@@ -15,6 +15,7 @@ struct Light
 	vec3 color;
 	vec3 direction;
 	vec3 position;
+	float intensity;
 };
 
 layout(binding=0, std140) uniform GlobalParams
@@ -53,6 +54,7 @@ struct Light
 	vec3 color;
 	vec3 direction;
 	vec3 position;
+	float intensity;
 };
 
 layout(binding=0, std140) uniform GlobalParams
@@ -69,17 +71,44 @@ in vec3 vViewDir;
 
 uniform sampler2D uTexture;
 
+uniform sampler2D uMetallic;
+uniform sampler2D uRoughness;
+uniform sampler2D uNormal;
+uniform sampler2D uAO;
+uniform sampler2D uEmissive;
+
+uniform bool useNormalTexture;
+
 layout(location = 0) out vec4 oAlbedo;
 layout(location = 1) out vec4 oNormals;
 layout(location = 2) out vec4 oPosition;
 layout(location = 3) out vec4 oViewDir;
 
+layout(location = 4) out vec4 oMetallic;
+layout(location = 5) out vec4 oRoughness;
+layout(location = 6) out vec4 oAo;
+layout(location = 7) out vec4 oEmissive;
+
 void main()
 {
-	oAlbedo = texture(uTexture, vTexCoord);
-	oNormals = vec4(vNormal, 1.0);
+	oAlbedo = vec4(texture(uTexture, vTexCoord).rgb, 1.0f); //texture(uTexture, vTexCoord);
 	oPosition = vec4(vPosition, 1.0);
 	oViewDir = vec4(vViewDir, 1.0);
+
+	if (useNormalTexture)
+	{
+		oNormals = vec4(texture(uNormal, vTexCoord).rgb, 1.0);
+	}
+	else
+	{
+		//oNormals = vec4(texture(uNormal, vTexCoord).rgb, 1.0);
+		//oNormals = vec4(vNormal, 1.0);
+	}
+
+	oMetallic = vec4(vec3(texture(uMetallic, vTexCoord).r), 1.0f);
+	oRoughness = vec4(vec3(texture(uRoughness, vTexCoord).r), 1.0f);
+	oAo = vec4(vec3(texture(uAO, vTexCoord).r), 1.0f);
+	oEmissive = vec4(texture(uEmissive, vTexCoord).rgb, 1.0f);
 }
 
 #endif
