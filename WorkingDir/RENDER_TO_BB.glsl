@@ -20,10 +20,13 @@ struct Light
 
 layout(binding=0, std140) uniform GlobalParams
 {
-	vec3 uCamPosition;
+	vec3 uCameraPosition;
 	uint uLightCount;
 	Light uLight[16];
 };
+
+uniform bool useNormalTexture;
+uniform sampler2D uNormal; // Normal sampler
 
 out vec2 vTexCoord;
 out vec3 vPosition;
@@ -40,11 +43,19 @@ void main()
 {
 	vTexCoord = aTexCoord;
 	vPosition = vec3(uWorldMatrix * vec4(aPosition, 1.0));
-	vNormal = vec3(uWorldMatrix * vec4(aNormal, 0.0));
-	vViewDir = uCamPosition - vPosition;
-	float clippingScale = 1.0f;
+	vViewDir = uCameraPosition - vPosition;
 
-	gl_Position = uWorldViewProjectionMatrix * vec4(aPosition, clippingScale);
+	if (useNormalTexture)
+	{
+		vNormal = vec3(uWorldMatrix * vec4(texture(uNormal, vTexCoord).rgb, 0.0f));
+	}
+	else
+	{
+		vNormal = vec3(uWorldMatrix * vec4(aNormal, 0.0));
+	}
+	//vNormal = vec3(uWorldMatrix * vec4(aNormal, 0.0));
+
+	gl_Position = uWorldViewProjectionMatrix * vec4(aPosition, 1.0f);
 }
 
 #elif defined(FRAGMENT) ///////////////////////////////////////////////
@@ -60,7 +71,7 @@ struct Light
 
 layout(binding=0, std140) uniform GlobalParams
 {
-	vec3 uCamPosition;
+	vec3 uCameraPosition;
 	uint uLightCount;
 	Light uLight[16];
 };
@@ -75,14 +86,13 @@ in vec3 vNormal; // Normal
 in vec3 vViewDir; // View Direction // Camera Position
 
 uniform bool useEmissive;
-uniform bool useNormalTexture;
 
 // Samplers
 uniform sampler2D uTexture; // Albedo sampler
 uniform sampler2D uMetallic; // Metallic sampler
 uniform sampler2D uRoughness; // Roughness sampler
 uniform sampler2D uAO; // Ambient Occlusion sampler
-uniform sampler2D uNormal; // Normal sampler
+//uniform sampler2D uNormal; // Normal sampler
 uniform sampler2D uEmissive; // Emissive sampler
 
 // Material parameters
@@ -90,7 +100,6 @@ vec3 albedo;
 float metallic;
 float roughness;
 float ao;
-vec3 normal;
 vec3 emissive;
 
 // Lightning Calculation methods
@@ -144,21 +153,14 @@ void SamplerAllTextures()
     ao = texture(uAO, vTexCoord).r;
 	emissive = texture(uEmissive, vTexCoord).rgb;
 
-	if (useNormalTexture)
-	{
-		normal = texture(uNormal, vTexCoord).rgb;
-	}
-	else
-	{
-		normal = vNormal;
-	}
+
 }
 
 void main()
 {
 	SamplerAllTextures();
 
-	vec3 N = normalize(normal); //vNormal
+	vec3 N = normalize(vNormal); //vNormal
 	vec3 V = normalize(vViewDir - vPosition); // Podria estar malament
 
 	vec3 F0 = vec3(0.04);

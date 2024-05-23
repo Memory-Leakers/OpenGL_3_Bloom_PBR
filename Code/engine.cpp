@@ -255,10 +255,10 @@ void Init(App* app)
     app->texturedMeshProgram_uEmissive = glGetUniformLocation(texturedMeshProgram.handle, "uEmissive");
 
     //u32 PatrickModelIndex = ModelLoader::LoadModel(app, "Patrick/Patrick.obj");
-    //u32 GroundModelIndex = ModelLoader::LoadModel(app, "./ground.obj");
+    u32 GroundModelIndex = ModelLoader::LoadModel(app, "./ground.obj");
     //u32 GoombaModelIndex = ModelLoader::LoadModel(app, "Goomba/goomba.obj");
     app->SphereModelIndex = ModelLoader::LoadModel(app, "./sphere.obj");
-    //u32 ChestModelIndex = ModelLoader::LoadModel(app, "Chest/Chest.obj");
+    u32 ChestModelIndex = ModelLoader::LoadModel(app, "Chest/Chest.obj");
 
     u32 CarModelIndex = ModelLoader::LoadModel(app, "Car/Car.obj");
 
@@ -281,21 +281,21 @@ void Init(App* app)
        
     app->entities.push_back({ vec3(0.0, -1.0, 0.0), vec3(0.01), CarModelIndex, 0, 0 });
 
-    //app->entities.push_back({ vec3(0, -1.55, 0.0), vec3(5, 5, 5), GroundModelIndex, 0, 0 });
+    app->entities.push_back({ vec3(0, -1.55, 0.0), vec3(5, 5, 5), GroundModelIndex, 0, 0 });
 
    // app->entities.push_back({ vec3(2.5, -1, 2.5), vec3(0.03), GoombaModelIndex, 0, 0 });
 
-    //app->entities.push_back({ vec3(-2.5, -1.5, 2.5), vec3(2), ChestModelIndex, 0, 0 });
+    app->entities.push_back({ vec3(-2.5, -1.5, 2.5), vec3(2), ChestModelIndex, 0, 0 });
 
-    CreateLight(app, { LightType::LightType_Directional, vec3(0.88, 0.67, 0.169), vec3(-0.70, 0.0, -0.2), vec3(0.0, 0.0, 0.0), 2.5f });
+    CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 1.0, 1.0), vec3(-0.70, 0.0, -0.2), vec3(0.0, 0.0, 0.0), 2.5f });
     //CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 0.0, 1.0), vec3(-1.0, 1.0, -1.0), vec3(0.0, 0.0, 0.0), 1.0f});
     //CreateLight(app, { LightType::LightType_Point, vec3(1.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0), vec3(0.0, 3.0, 0.0), 1.0f });
     //CreateLight(app, { LightType::LightType_Point, vec3(0.0, 1.0, 0.0), vec3(1.0, 1.0, 1.0), vec3(6.0, 0.0, 4.0), 1.0f });
-    CreateLight(app, { LightType::LightType_Point, vec3(0.05, 0.74, 0.97), vec3(1.0, 1.0, 1.0), vec3(0.0, 0.5, 1.0), 5.0f });
+    CreateLight(app, { LightType::LightType_Point, vec3(0.05, 0.74, 0.97), vec3(1.0, 1.0, 1.0), vec3(-1.30, -0.1, 2.0), 87.0f });
 
     app->ConfigureFrameBuffer(app->defferedFrameBuffer);
 
-    app->mode = Mode_Deferred;
+    app->mode = Mode_Forward;
 
     app->cam.Init(app->displaySize);
 }
@@ -442,7 +442,7 @@ void Update(App* app)
     }
     
     // Apply
-    app->cam.Move();
+    app->cam.UpdateViewProjection();
 }
 
 void Render(App* app)
@@ -596,13 +596,13 @@ void App::UpdateEntityBuffer()
     for (auto it = entities.begin(); it != entities.end(); ++it)
     {
         glm::mat4 world = TransformPositionScale(it->position, it->scale);
-        //glm::mat4 WVP = projection * view * world;
+        glm::mat4 WVP = cam.projection * cam.view * world;
 
         Buffer& localBuffer = localUniformBuffer;
         BufferManager::AlignHead(localBuffer, uniformBlockAlignment);
         it->localParamsOffset = localBuffer.head;
         PushMat4(localBuffer, world);
-        PushMat4(localBuffer, cam.GetWVP(world));
+        PushMat4(localBuffer, WVP);
         it->localParamsSize = localBuffer.head - it->localParamsOffset;
 
         ++iteration;
@@ -746,8 +746,9 @@ void Camera::Init(ivec2 displaySize)
     direction = glm::vec3(0.562, -0.358, -0.746);
 }
 
-void Camera::Move()
+void Camera::UpdateViewProjection()
 {
+    projection = glm::perspective(glm::radians(60.0f), aspectRatio, zNear, zFar);
     view = glm::lookAt(position, position + front, up);
 }
 
@@ -774,9 +775,4 @@ void Camera::LookAround(float mouseX, float mouseY)
     direction.y = sin(glm::radians(pitch));
     direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     front = glm::normalize(direction);
-}
-
-glm::mat4 Camera::GetWVP(glm::mat4 world)
-{
-    return projection * view * world;
 }

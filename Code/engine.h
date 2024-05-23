@@ -46,11 +46,9 @@ struct Camera
 
     void Init(ivec2 displaySize);
 
-    void Move();
+    void UpdateViewProjection();
 
     void LookAround(float xoffset, float yoffset);
-
-    glm::mat4 GetWVP(glm::mat4 world);
 };
 
 struct App
