@@ -52,7 +52,6 @@ uniform bool useEmissive;
 uniform sampler2D uMetallic; // Metallic sampler
 uniform sampler2D uRoughness; // Roughness sampler
 uniform sampler2D uAO; // Ambient Occlusion sampler
-uniform sampler2D uNormal; // Normal sampler
 uniform sampler2D uEmissive; // Emissive sampler
 
 // Material parameters
@@ -64,7 +63,6 @@ vec3 normal;
 vec3 emissive;
 
 vec3 vPosition;
-vec3 vNormal;
 vec3 vViewDir;
 float vDepth;
 
@@ -127,11 +125,10 @@ void SamplerAllTextures()
 	metallic = texture(uMetallic, vTexCoord).r;
     roughness = texture(uRoughness, vTexCoord).r;
     ao = texture(uAO, vTexCoord).r;
-	normal = texture(uNormal, vTexCoord).rgb; //texture normal
+	normal = texture(uNormals, vTexCoord).rgb; //texture normal
 	emissive = texture(uEmissive, vTexCoord).rgb;
 
 	vPosition = texture(uPosition, vTexCoord).rgb;
-	vNormal = texture(uNormals, vTexCoord).rgb; // Normal normal
 	vViewDir = texture(uViewDir, vTexCoord).rgb;
 	vDepth = texture(uDepth, vTexCoord).r;
 }
@@ -148,7 +145,7 @@ bool SamplerFilter()
 		}
 		else if (showNormals)
 		{
-			oColor = vec4(vNormal, 1.0);
+			oColor = vec4(normal, 1.0);
 		}
 		else if (showPosition)
 		{
@@ -191,7 +188,7 @@ void main()
 
 	if (SamplerFilter() == false)
 	{
-		vec3 N = normalize(vNormal); //vNormal
+		vec3 N = normalize(normal); //vNormal
 		vec3 V = normalize(vViewDir - vPosition); // Podria estar malament
 
 		vec3 F0 = vec3(0.04);
@@ -249,7 +246,7 @@ void main()
 		color = color / (color + vec3(1.0));
 		color = pow(color, vec3(1.0/2.2));
 
-		oColor =  vec4(albedo, 1.0);;
+		oColor =  vec4(color, 1.0);;
 	}
 }
 

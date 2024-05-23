@@ -75,6 +75,7 @@ in vec3 vNormal; // Normal
 in vec3 vViewDir; // View Direction // Camera Position
 
 uniform bool useEmissive;
+uniform bool useNormalTexture;
 
 // Samplers
 uniform sampler2D uTexture; // Albedo sampler
@@ -141,15 +142,23 @@ void SamplerAllTextures()
 	metallic = texture(uMetallic, vTexCoord).r;
     roughness = texture(uRoughness, vTexCoord).r;
     ao = texture(uAO, vTexCoord).r;
-	normal = texture(uNormal, vTexCoord).rgb;
 	emissive = texture(uEmissive, vTexCoord).rgb;
+
+	if (useNormalTexture)
+	{
+		normal = texture(uNormal, vTexCoord).rgb;
+	}
+	else
+	{
+		normal = vNormal;
+	}
 }
 
 void main()
 {
 	SamplerAllTextures();
 
-	vec3 N = normalize(vNormal); //vNormal
+	vec3 N = normalize(normal); //vNormal
 	vec3 V = normalize(vViewDir - vPosition); // Podria estar malament
 
 	vec3 F0 = vec3(0.04);
@@ -206,7 +215,7 @@ void main()
 	color = color / (color + vec3(1.0));
 	color = pow(color, vec3(1.0/2.2));
 
-	oColor = vec4(emissive, 1.0f);	
+	oColor = vec4(color, 1.0f);	
 }
 
 #endif

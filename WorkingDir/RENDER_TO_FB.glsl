@@ -70,7 +70,6 @@ in vec3 vNormal;
 in vec3 vViewDir;
 
 uniform sampler2D uTexture;
-
 uniform sampler2D uMetallic;
 uniform sampler2D uRoughness;
 uniform sampler2D uNormal;
@@ -101,8 +100,7 @@ void main()
 	}
 	else
 	{
-		//oNormals = vec4(texture(uNormal, vTexCoord).rgb, 1.0);
-		//oNormals = vec4(vNormal, 1.0);
+		oNormals = vec4(vNormal, 1.0);
 	}
 
 	oMetallic = vec4(vec3(texture(uMetallic, vTexCoord).r), 1.0f);

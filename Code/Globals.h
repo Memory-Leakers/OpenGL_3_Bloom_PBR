@@ -139,11 +139,11 @@ enum Mode
 {
     Mode_Forward, 
     Mode_Deferred,
+    Mode_Depth,
     Mode_Albedo,
     Mode_Normals,
     Mode_Position,
     Mode_ViewDirection,
-    Mode_Depth,
     Mode_Metallic,
     Mode_Roughness,
     Mode_Ao,

@@ -287,11 +287,11 @@ void Init(App* app)
 
     //app->entities.push_back({ vec3(-2.5, -1.5, 2.5), vec3(2), ChestModelIndex, 0, 0 });
 
-    CreateLight(app, { LightType::LightType_Directional, vec3(0.88, 0.67, 0.169), vec3(1.0, 0.0, -0.2), vec3(0.0, 0.0, 0.0), 5.0f });
+    CreateLight(app, { LightType::LightType_Directional, vec3(0.88, 0.67, 0.169), vec3(-0.70, 0.0, -0.2), vec3(0.0, 0.0, 0.0), 2.5f });
     //CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 0.0, 1.0), vec3(-1.0, 1.0, -1.0), vec3(0.0, 0.0, 0.0), 1.0f});
     //CreateLight(app, { LightType::LightType_Point, vec3(1.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0), vec3(0.0, 3.0, 0.0), 1.0f });
     //CreateLight(app, { LightType::LightType_Point, vec3(0.0, 1.0, 0.0), vec3(1.0, 1.0, 1.0), vec3(6.0, 0.0, 4.0), 1.0f });
-    CreateLight(app, { LightType::LightType_Point, vec3(0.05, 0.74, 0.97), vec3(1.0, 1.0, 1.0), vec3(3.0, 1.0, 1.0), 5.0f });
+    CreateLight(app, { LightType::LightType_Point, vec3(0.05, 0.74, 0.97), vec3(1.0, 1.0, 1.0), vec3(0.0, 0.5, 1.0), 5.0f });
 
     app->ConfigureFrameBuffer(app->defferedFrameBuffer);
 
@@ -319,7 +319,7 @@ void Gui(App* app)
     ImGui::Text("FPS: %f", 1.0f / app->deltaTime);
     ImGui::Text("%s", app->openglDebugInfo.c_str());
 
-    const char* RenderModes[] = {"FORWARD", "DEFERRED", "ALBEDO", "NORMALS", "POSITION", "VIEW DIRECTION", "DEPTH", "METALLIC", "ROUGHNESS", "AMBIENT OCCLUSSION", "EMISSIVE"};
+    const char* RenderModes[] = {"FORWARD", "DEFERRED", "DEPTH", "ALBEDO", "NORMALS", "POSITION", "VIEW DIRECTION", "METALLIC", "ROUGHNESS", "AMBIENT OCCLUSSION", "EMISSIVE"};
     if (ImGui::BeginCombo("Render Mode", RenderModes[app->mode]))
     {
         for (size_t i = 0; i < ARRAY_COUNT(RenderModes); ++i)
@@ -336,11 +336,14 @@ void Gui(App* app)
     if (app->mode != Mode::Mode_Forward)
     {
         ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "G-Buffer textures");
+        ImGui::Dummy(ImVec2(20.0f, 20.0f));
         for (size_t i = 0; i < app->defferedFrameBuffer.colorAttachment.size(); ++i)
         {
+            ImGui::Text(RenderModes[i+3]);
             ImGui::Image((ImTextureID)app->defferedFrameBuffer.colorAttachment[i], ImVec2(320, 180), ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::Dummy(ImVec2(7.5f, 7.5f));
         }
-
+        ImGui::Text("DEPTH");
         ImGui::Image((ImTextureID)app->defferedFrameBuffer.depthHandle, ImVec2(320, 180), ImVec2(0, 1), ImVec2(1, 0));
     }
 
@@ -502,7 +505,7 @@ void Render(App* app)
                 glBindBufferRange(GL_UNIFORM_BUFFER, BINDING(0), app->localUniformBuffer.handle, app->globalParamsOffset, app->globalParamsSize);
                 
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.colorAttachment[1]);
+                glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.colorAttachment[0]);
                 glUniform1i(glGetUniformLocation(FBToBB.handle, "uAlbedo"), 0);
 
                 glActiveTexture(GL_TEXTURE1);
@@ -530,7 +533,7 @@ void Render(App* app)
                 // AO
                 glActiveTexture(GL_TEXTURE6);
                 glBindTexture(GL_TEXTURE_2D, app->defferedFrameBuffer.colorAttachment[6]);
-                glUniform1i(glGetUniformLocation(FBToBB.handle, "uAo"), 6);
+                glUniform1i(glGetUniformLocation(FBToBB.handle, "uAO"), 6);
 
                 // Emissive
                 glActiveTexture(GL_TEXTURE7);
@@ -674,29 +677,27 @@ void App::RenderGeometry(const Program aBindedProgram)
             glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.albedoTextureIdx].handle);
             glUniform1i(texturedMeshProgram_uTexture, 0);
 
-            // Metallic
+            // Normal
+            bool useNormalTexture = subMeshMaterial.bumpTextureIdx != 0 ? 1 : 0;
+            glUniform1i(glGetUniformLocation(aBindedProgram.handle, "useNormalTexture"), useNormalTexture);
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.specularTextureIdx].handle);
-            glUniform1i(texturedMeshProgram_uMetallic, 1);
+            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.bumpTextureIdx].handle);
+            glUniform1i(texturedMeshProgram_uNormal, 1);
 
-            // Roughness
+            // Metallic
             glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.shininessTextureIdx].handle);
-            glUniform1i(texturedMeshProgram_uRoughness, 2);
+            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.specularTextureIdx].handle);
+            glUniform1i(texturedMeshProgram_uMetallic, 2);
+
+            //// Roughness
+            //glActiveTexture(GL_TEXTURE3);
+            //glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.shininessTextureIdx].handle);
+            //glUniform1i(texturedMeshProgram_uRoughness, 3);
 
             // AO
-            glActiveTexture(GL_TEXTURE3);
-            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.aoTextureIdx].handle);
-            glUniform1i(texturedMeshProgram_uAO, 3);
-
-            bool useNormalTexture = subMeshMaterial.normalsTextureIdx != 0 ? 1 : 0;
-            glUniform1i(glGetUniformLocation(aBindedProgram.handle, "useNormalTexture"), useNormalTexture);
-
-            // Normal
             glActiveTexture(GL_TEXTURE4);
-            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.bumpTextureIdx].handle);
-            glUniform1i(texturedMeshProgram_uNormal, 4);
-
+            glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.aoTextureIdx].handle);
+            glUniform1i(texturedMeshProgram_uAO, 4);
 
             // Turn On/Off emissive
             bool useEmissive = subMeshMaterial.emissiveTextureIdx != 0 ? 1 : 0;
