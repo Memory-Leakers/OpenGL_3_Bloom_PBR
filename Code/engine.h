@@ -154,7 +154,7 @@ struct App
     GLuint globalParamsOffset;
     GLuint globalParamsSize;
 
-    GLuint prefinalTextureID;
+    GLuint prefinalTextureID = 0;
 
     Bloom bloom;
 };

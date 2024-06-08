@@ -268,7 +268,7 @@ void Init(App* app)
 	app->SphereModelIndex = ModelLoader::LoadModel(app, "Models/Sphere/sphere.obj");
 	u32 ChestModelIndex = ModelLoader::LoadModel(app, "Models/Chest/Chest.obj");
 
-	//u32 CarModelIndex = ModelLoader::LoadModel(app, "Models/Car/Car.obj");
+	u32 CarModelIndex = ModelLoader::LoadModel(app, "Models/Car/Car.obj");
 
 	VertexBufferLayout vertexBufferLayout = {};
 	vertexBufferLayout.attributes.push_back(VertexBufferAttribute{ 0, 3, 0 });
@@ -287,7 +287,7 @@ void Init(App* app)
 	//app->entities.push_back({ vec3(2.35, 0.0, 0.0), vec3(0.45), PatrickModelIndex, 0, 0 });
 	//app->entities.push_back({ vec3(-2.35, 0.0, 0.0), vec3(0.45), PatrickModelIndex, 0, 0 });
 
-	//app->entities.push_back({ vec3(0.0, -1.0, 0.0), vec3(0.01), CarModelIndex, 0, 0 });
+	app->entities.push_back({ vec3(0.0, -1.0, 0.0), vec3(0.01), CarModelIndex, 0, 0 });
 
 	app->entities.push_back({ vec3(0, -1.55, 0.0), vec3(5, 5, 5), GroundModelIndex, 0, 0 });
 
@@ -330,6 +330,9 @@ void Gui(App* app)
 	ImGui::Begin("Info");
 	ImGui::Text("FPS: %f", 1.0f / app->deltaTime);
 	ImGui::Text("%s", app->openglDebugInfo.c_str());
+
+	ImGui::Checkbox("Bloom", &app->bloom.active);
+	ImGui::Image((ImTextureID)app->prefinalTextureID, ImVec2(320, 180), ImVec2(0, 1), ImVec2(1, 0));
 
 	const char* RenderModes[] = { "FORWARD", "DEFERRED", "DEPTH", "ALBEDO", "NORMALS", "POSITION", "VIEW DIRECTION", "METALLIC", "ROUGHNESS", "AMBIENT OCCLUSSION", "EMISSIVE" };
 	if (ImGui::BeginCombo("Render Mode", RenderModes[app->mode]))
@@ -583,6 +586,12 @@ void Render(App* app)
 	// get final render and save in texture
 	glReadPixels(0, 0, app->displaySize.x, app->displaySize.y, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
+	//Clean previous
+	if (app->prefinalTextureID != 0) {
+		glDeleteTextures(1, &app->prefinalTextureID);
+		app->prefinalTextureID = 0;
+	}
+
 	glGenTextures(1, &app->prefinalTextureID);
 
 	glBindTexture(GL_TEXTURE_2D, app->prefinalTextureID);
@@ -591,6 +600,8 @@ void Render(App* app)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, app->displaySize.x, app->displaySize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
