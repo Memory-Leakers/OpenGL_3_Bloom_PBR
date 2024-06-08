@@ -217,6 +217,7 @@ struct FrameBuffer
 {
     GLuint fbHandle;
     std::vector<GLuint> colorAttachment;
+    std::vector<GLuint> bloomAttachment;
     GLuint depthHandle;
 };
 

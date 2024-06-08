@@ -22,6 +22,14 @@ const u16 indices[] =
     0,2,3
 };
 
+struct Bloom
+{
+    bool active = false;
+    GLuint rtBright; // For blitting brightest pixels and vertical blur
+    GLuint rtBloomH; // For first pass horizontal blur
+    std::vector<FrameBuffer>fbBloom;
+};
+
 struct Camera
 {
     float cameraSpeed;
@@ -61,6 +69,14 @@ struct App
 
     const GLuint CreateTexture(const bool isFloatingPoint = false);
 
+    void InitBloomEffect();
+
+    void PassBlitBrightPixels(FrameBuffer& fb, GLuint inputTexture, float threshold);
+
+    void PassBlur(FrameBuffer& fb,vec2 viewportSize, GLenum colorAttachment, GLuint inputTexture, GLuint lod, vec2 direction);
+
+    void PassBloom(GLenum colorAttachment, GLuint inputTexture, GLuint maxLod);
+
     // Loop
     f32  deltaTime;
     bool isRunning;
@@ -87,6 +103,11 @@ struct App
     GLuint renderToBackBufferShader;
     GLuint renderToFrameBufferShader;
     GLuint framebufferToQuadShader;
+    
+    // for bloom
+    GLuint blitBrightestPixelsShader;
+    GLuint blurShader;
+    GLuint bloomShader;
 
     //u32 patricioModel = 0;
     GLuint texturedMeshProgram_uTexture;
@@ -132,6 +153,10 @@ struct App
 
     GLuint globalParamsOffset;
     GLuint globalParamsSize;
+
+    GLuint prefinalTextureID;
+
+    Bloom bloom;
 };
 
 void Init(App* app);
@@ -141,4 +166,3 @@ void Gui(App* app);
 void Update(App* app);
 
 void Render(App* app);
-
