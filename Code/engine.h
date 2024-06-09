@@ -25,6 +25,8 @@ const u16 indices[] =
 struct Bloom
 {
     bool active = false;
+    bool test = false;
+    float threshold = 1.0;
     GLuint rtBright; // For blitting brightest pixels and vertical blur
     GLuint rtBloomH; // For first pass horizontal blur
     std::vector<FrameBuffer>fbBloom;

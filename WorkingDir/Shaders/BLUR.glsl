@@ -9,8 +9,22 @@ out vec2 vTexCoord;
 
 void main()
 {
-	vTexCoord = aTexCoord;
-	gl_Position = vec4(aPosition, 1.0);
+	//vTexCoord = aTexCoord;
+
+    // 顶点坐标
+    vec2 vertices[4] = vec2[](
+        vec2(-1.0, -1.0),
+        vec2(1.0, -1.0),
+        vec2(-1.0, 1.0),
+        vec2(1.0, 1.0)
+    );
+
+    // 通过顶点索引获取顶点坐标
+    vec2 position = vertices[gl_VertexID];
+
+    vTexCoord = (position + 1.0) * 2;
+
+	gl_Position = vec4(vTexCoord, 0.0, 1.0);
 }
 
 #elif defined(FRAGMENT) ///////////////////////////////////////////////
@@ -32,7 +46,7 @@ void main()
 	oColor = vec4(0.0);
 
     vec2 directionFragCoord = gl_FragCoord.xy * direction;
-    int coord = int(directionFragCoord.x + eyeDirWorldSpace.y);
+    int coord = int(directionFragCoord.x + directionFragCoord.y);
     vec2 directionTexSize = texSize * direction;
     int size = int(directionTexSize.x + directionTexSize.y);
     int kernelRadius = 24;
@@ -42,9 +56,9 @@ void main()
     for(int i = kernelBegin; i <= kernelEnd; ++i)
     {
         float currentWeight = smoothstep(float(kernelRadius), 0.0, float(abs(i)));
-        vec2 finalTexCoords = texCoords + i * direction * texelSize;
+        vec2 finalTexCoords = vTexCoord + i * direction * texelSize;
         finalTexCoords = clamp(finalTexCoords, margin1, margin2);
-        oColor += textureLod(colorMap, finalTexCoord, inputLod) * currentWeight;
+        oColor += textureLod(colorMap, finalTexCoords, inputLod) * currentWeight;
         weight += currentWeight;
     }
 
