@@ -349,6 +349,9 @@ void Gui(App* app)
 	ImGui::Begin("Info");
 	ImGui::Text("FPS: %f", 1.0f / app->deltaTime);
 	ImGui::Text("%s", app->openglDebugInfo.c_str());
+	ImGui::Text("Made By Zhida Chen & Robert Recorda");
+
+	ImGui::Dummy(ImVec2(20.0f, 20.0f));
 
 	ImGui::Checkbox("PBR", &app->pbr);
 
