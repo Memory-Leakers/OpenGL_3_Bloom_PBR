@@ -644,8 +644,9 @@ void Render(App* app)
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		//app->PassBlur(app->bloom.fbBloom[0], vec2(app->displaySize.x, app->displaySize.y), GL_COLOR_ATTACHMENT0, app->bloom.rtBright, 0, vertical);
-		app->PassBlur(app->bloom.fbBloom[0], vec2(app->displaySize.x, app->displaySize.y), GL_COLOR_ATTACHMENT1, app->bloom.rtBright, 0, horizontal);
+		//app->PassBlur(app->bloom.fbBloom[0], vec2(app->displaySize.x, app->displaySize.y), GL_COLOR_ATTACHMENT1, app->bloom.rtBright, 0, horizontal);
 
+		/*
 		GLubyte* pix = new GLubyte[app->displaySize.x * app->displaySize.y * 4];
 		glReadPixels(0, 0, app->displaySize.x, app->displaySize.y, GL_RGBA, GL_UNSIGNED_BYTE, pix);
 		glBindTexture(GL_TEXTURE_2D, app->bloom.rtBloomH);
@@ -667,7 +668,7 @@ void Render(App* app)
 		app->PassBloom(GL_COLOR_ATTACHMENT0, app->bloom.rtBright, app->bloom.rtBloomH, 1);
 		
 
-		/*
+		
 		app->PassBlur(app->bloom.fbBloom[1], vec2(app->displaySize.x / 4, app->displaySize.y / 4), GL_COLOR_ATTACHMENT1, app->bloom.rtBright, 1, horizontal);
 		app->PassBlur(app->bloom.fbBloom[2], vec2(app->displaySize.x / 8, app->displaySize.y / 8), GL_COLOR_ATTACHMENT1, app->bloom.rtBright, 2, horizontal);
 		app->PassBlur(app->bloom.fbBloom[3], vec2(app->displaySize.x / 16, app->displaySize.y / 16), GL_COLOR_ATTACHMENT1, app->bloom.rtBright, 3, horizontal);
