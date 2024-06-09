@@ -292,7 +292,7 @@ void CalculateBasicLightning()
 			CalculateBlitVars(light, ambient, diffuse, specular);
 
 			lightResult = ambient + diffuse + specular;
-			finalColor += vec4(lightResult, 1.0) * textureColor * light.intensity;
+			finalColor += vec4(lightResult, 1.0) * textureColor * (light.intensity/2);
 		}
 		else
 		{
@@ -306,7 +306,7 @@ void CalculateBasicLightning()
 
 			CalculateBlitVars(light, ambient, diffuse, specular);
 			lightResult = (ambient * attenuation) + (diffuse * attenuation) + (specular * attenuation);
-			finalColor += vec4(lightResult, 1.0) * textureColor * light.intensity;
+			finalColor += vec4(lightResult, 1.0) * textureColor * (light.intensity/2);
 		}
 	}
 
