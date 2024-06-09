@@ -20,9 +20,9 @@ Robert Recordà
 ## PBR
 ### Enabled/Disabled Pictures
 
-![Team_Photo](https://github.com/AdriaSeSa/Chaketeros/blob/main/Game/MegaBomberman/Assets/Images/WikiImages/TeamPhoto.png)
+![PBR 1](https://github.com/Memory-Leakers/OpenGL_3_Bloom_PBR/blob/main/WorkingDir/Fotos/0-1.jpg))
 
-![Team_Photo](https://github.com/AdriaSeSa/Chaketeros/blob/main/Game/MegaBomberman/Assets/Images/WikiImages/TeamPhoto.png)
+![PBR 2](https://github.com/Memory-Leakers/OpenGL_3_Bloom_PBR/blob/main/WorkingDir/Fotos/1-1.jpg)
 
 To show the effect of each technique, show a couple of renders from the
 same point of view, with each technique enabled and disabled.
