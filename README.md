@@ -21,12 +21,12 @@ Robert Recordà
 ## PBR
 ### Enabled/Disabled Pictures
 
-![PBR 1](https://github.com/Memory-Leakers/OpenGL_3_Bloom_PBR/blob/main/WorkingDir/Fotos/0-1.jpg))
+![PBR 1](https://github.com/Memory-Leakers/OpenGL_3_Bloom_PBR/blob/main/WorkingDir/Fotos/0-1.jpg)
 
 ![PBR 2](https://github.com/Memory-Leakers/OpenGL_3_Bloom_PBR/blob/main/WorkingDir/Fotos/1-1.jpg)
 
 ### Options (Screenshots)
-Explain how to enable / disable / configure the options you may have.
+![PBR Options](https://github.com/Memory-Leakers/OpenGL_3_Bloom_PBR/blob/main/WorkingDir/Fotos/PBR-Options.jpg)
 
 Inside the info tab/panel there is a toggle called PBR that turns it On or Off.
 
