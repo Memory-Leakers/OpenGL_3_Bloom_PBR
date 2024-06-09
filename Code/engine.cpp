@@ -263,12 +263,17 @@ void Init(App* app)
 	app->texturedMeshProgram_uEmissive = glGetUniformLocation(texturedMeshProgram.handle, "uEmissive");
 
 	//u32 PatrickModelIndex = ModelLoader::LoadModel(app, "Models/Patrick/Patrick.obj");
-	u32 GroundModelIndex = ModelLoader::LoadModel(app, "Models/Ground/ground.obj");
+	//u32 GroundModelIndex = ModelLoader::LoadModel(app, "Models/Ground/ground.obj");
 	//u32 GoombaModelIndex = ModelLoader::LoadModel(app, "Models/Goomba/goomba.obj");
 	app->SphereModelIndex = ModelLoader::LoadModel(app, "Models/Sphere/sphere.obj");
-	u32 ChestModelIndex = ModelLoader::LoadModel(app, "Models/Chest/Chest.obj");
+	//u32 ChestModelIndex = ModelLoader::LoadModel(app, "Models/Chest/Chest.obj");
 
 	u32 CarModelIndex = ModelLoader::LoadModel(app, "Models/Car/Car.obj");
+	u32 Car2ModelIndex = ModelLoader::LoadModel(app, "Models/Car2/Plane Car.obj");
+	u32 RavineModelIndex = ModelLoader::LoadModel(app, "Models/Ravine/canyondesert-asset-library.obj");
+	//u32 CathedralModelIndex = ModelLoader::LoadModel(app, "Models/Cathedral/Cathedral.obj");
+
+	//u32 StreetIndex = ModelLoader::LoadModel(app, "Models/Street/PGA-Street.obj");
 
 	VertexBufferLayout vertexBufferLayout = {};
 	vertexBufferLayout.attributes.push_back(VertexBufferAttribute{ 0, 3, 0 });
@@ -287,19 +292,34 @@ void Init(App* app)
 	//app->entities.push_back({ vec3(2.35, 0.0, 0.0), vec3(0.45), PatrickModelIndex, 0, 0 });
 	//app->entities.push_back({ vec3(-2.35, 0.0, 0.0), vec3(0.45), PatrickModelIndex, 0, 0 });
 
-	app->entities.push_back({ vec3(0.0, -1.0, 0.0), vec3(0.01), CarModelIndex, 0, 0 });
+	app->entities.push_back({ vec3(-1.0, -3.65, 0.0), vec3(0.01), CarModelIndex, 0, 0 });
+	app->entities.push_back({ vec3(1.0, -3.65, 0.0), vec3(0.5), Car2ModelIndex, 0, 0 });
+	app->entities.push_back({ vec3(0.0, -1.0, 0.0), vec3(0.50), RavineModelIndex, 0, 0 });
+	//app->entities.push_back({ vec3(0.0, 0.0, 0.0), vec3(1.00), StreetIndex, 0, 0 });
 
-	app->entities.push_back({ vec3(0, -1.55, 0.0), vec3(5, 5, 5), GroundModelIndex, 0, 0 });
+	//app->entities.push_back({ vec3(0, -1.55, 0.0), vec3(5, 5, 5), GroundModelIndex, 0, 0 });
 
 	// app->entities.push_back({ vec3(2.5, -1, 2.5), vec3(0.03), GoombaModelIndex, 0, 0 });
 
-	app->entities.push_back({ vec3(-2.5, -1.5, 2.5), vec3(2), ChestModelIndex, 0, 0 });
+	//app->entities.push_back({ vec3(0, 0, 0), vec3(1), ChestModelIndex, 0, 0 });
 
-	CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 1.0, 1.0), vec3(-0.70, 0.0, -0.2), vec3(0.0, 0.0, 0.0), 2.5f });
+	CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 1.0, 1.0), vec3(-0.70, 0.0, -0.2), vec3(0.0, 0.0, 0.0), 1.0f });
 	//CreateLight(app, { LightType::LightType_Directional, vec3(1.0, 0.0, 1.0), vec3(-1.0, 1.0, -1.0), vec3(0.0, 0.0, 0.0), 1.0f});
 	//CreateLight(app, { LightType::LightType_Point, vec3(1.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0), vec3(0.0, 3.0, 0.0), 1.0f });
 	//CreateLight(app, { LightType::LightType_Point, vec3(0.0, 1.0, 0.0), vec3(1.0, 1.0, 1.0), vec3(6.0, 0.0, 4.0), 1.0f });
-	CreateLight(app, { LightType::LightType_Point, vec3(0.05, 0.74, 0.97), vec3(1.0, 1.0, 1.0), vec3(-1.30, -0.1, 2.0), 87.0f });
+	CreateLight(app, { LightType::LightType_Point, vec3(0.9686, 0.7569, 0.0510), vec3(1.0, 1.0, 1.0), vec3(0.10, -3.1, 2.6), 2.5f });
+	CreateLight(app, { LightType::LightType_Point, vec3(0.0510, 0.1294, 0.9686), vec3(1.0, 1.0, 1.0), vec3(0.10, -3.1, 0.1), 2.5f });
+	CreateLight(app, { LightType::LightType_Point, vec3(0.0510, 0.9686, 0.0941), vec3(1.0, 1.0, 1.0), vec3(0.10, -3.1, -3.0), 2.5f });
+
+	CreateLight(app, { LightType::LightType_Point, vec3(0.9686, 0.7569, 0.0510), vec3(1.0, 1.0, 1.0), vec3(2.10, -3.1, 2.6), 2.5f });
+	CreateLight(app, { LightType::LightType_Point, vec3(0.0510, 0.1294, 0.9686), vec3(1.0, 1.0, 1.0), vec3(2.10, -3.1, 0.1), 2.5f });
+	CreateLight(app, { LightType::LightType_Point, vec3(0.0510, 0.9686, 0.0941), vec3(1.0, 1.0, 1.0), vec3(2.10, -3.1, -3.0), 2.5f });
+
+	CreateLight(app, { LightType::LightType_Point, vec3(0.9686, 0.7569, 0.0510), vec3(1.0, 1.0, 1.0), vec3(-2.20, -3.1, 2.6), 2.5f });
+	CreateLight(app, { LightType::LightType_Point, vec3(0.0510, 0.1294, 0.9686), vec3(1.0, 1.0, 1.0), vec3(-2.20, -3.1, 0.1), 2.5f });
+	CreateLight(app, { LightType::LightType_Point, vec3(0.0510, 0.9686, 0.0941), vec3(1.0, 1.0, 1.0), vec3(-2.20, -3.1, -3.0), 2.5f });
+
+
 
 	app->ConfigureFrameBuffer(app->defferedFrameBuffer);
 
@@ -330,6 +350,8 @@ void Gui(App* app)
 	ImGui::Begin("Info");
 	ImGui::Text("FPS: %f", 1.0f / app->deltaTime);
 	ImGui::Text("%s", app->openglDebugInfo.c_str());
+
+	ImGui::Checkbox("PBR", &app->pbr);
 
 	ImGui::Checkbox("Bloom", &app->bloom.active);
 	ImGui::Image((ImTextureID)app->prefinalTextureID, ImVec2(320, 180), ImVec2(0, 1), ImVec2(1, 0));
@@ -573,6 +595,8 @@ void Render(App* app)
 		glUniform1i(glGetUniformLocation(FBToBB.handle, "showAo"), app->mode == Mode_Ao ? 1 : 0);
 		glUniform1i(glGetUniformLocation(FBToBB.handle, "showEmissive"), app->mode == Mode_Emissive ? 1 : 0);
 
+		glUniform1i(glGetUniformLocation(FBToBB.handle, "usePBR"), app->pbr);
+
 		glBindVertexArray(app->vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 
@@ -601,8 +625,6 @@ void Render(App* app)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	
-
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, app->displaySize.x, app->displaySize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	delete[] pixels;
@@ -612,6 +634,7 @@ void Render(App* app)
 	// bloom efect
 	if (app->bloom.active)
 	{
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		const vec2 horizontal(1.0, 0.0);
 		const vec2 vertical(0.0, 1.0);
 
@@ -777,6 +800,8 @@ void App::RenderGeometry(const Program aBindedProgram)
 			glBindTexture(GL_TEXTURE_2D, textures[subMeshMaterial.emissiveTextureIdx].handle);
 			glUniform1i(texturedMeshProgram_uEmissive, 5);
 
+
+			glUniform1i(glGetUniformLocation(aBindedProgram.handle, "usePBR"), pbr);
 
 			SubMesh& submesh = mesh.submeshes[i];
 			glDrawElements(GL_TRIANGLES, submesh.indices.size(), GL_UNSIGNED_INT, (void*)(u64)submesh.indexOffset);
@@ -955,6 +980,9 @@ void App::PassBloom(GLenum colorAttachment, GLuint inputTexture, GLuint maxLod)
 
 	RenderGeometry(bloom);
 	glUseProgram(0);
+
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 }
 
 void Camera::Init(ivec2 displaySize)

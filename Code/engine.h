@@ -38,7 +38,7 @@ struct Camera
     float zFar = 1000.0f;
     glm::mat4 projection;
 
-    vec3 position = vec3(-2.195, 1.108, 3.273);
+    vec3 position = vec3(-0.095, -2.492, 4.473);
     vec3 direction;
 
     glm::mat4 view;
@@ -103,6 +103,10 @@ struct App
     GLuint renderToBackBufferShader;
     GLuint renderToFrameBufferShader;
     GLuint framebufferToQuadShader;
+
+    GLuint renderToBackBufferShaderNoPBR;
+    GLuint renderToFrameBufferShaderNoPBR;
+    GLuint framebufferToQuadShaderNoPBR;
     
     // for bloom
     GLuint blitBrightestPixelsShader;
@@ -157,6 +161,8 @@ struct App
     GLuint prefinalTextureID = 0;
 
     Bloom bloom;
+
+    bool pbr = false;
 };
 
 void Init(App* app);

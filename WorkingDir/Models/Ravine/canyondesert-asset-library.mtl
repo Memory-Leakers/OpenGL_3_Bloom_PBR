@@ -1,0 +1,15 @@
+# Blender 4.1.1 MTL File: 'canyondesert-asset-library.blend'
+# www.blender.org
+
+newmtl Canyon_Beta_Ravine
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+# map_Ns textures/roughness.png
+map_Kd textures/albedo.jpg
+map_Bump textures/normal.jpg
+map_Ka textures/ao.jpg

@@ -25,13 +25,11 @@ layout(binding=0, std140) uniform GlobalParams
 	Light uLight[16];
 };
 
-uniform bool useNormalTexture;
-uniform sampler2D uNormal; // Normal sampler
-
 out vec2 vTexCoord;
 out vec3 vPosition;
 out vec3 vNormal;
 out vec3 vViewDir;
+out mat4 vWorldMatrix;
 
 layout(binding=1, std140) uniform LocalParams
 {
@@ -44,16 +42,8 @@ void main()
 	vTexCoord = aTexCoord;
 	vPosition = vec3(uWorldMatrix * vec4(aPosition, 1.0));
 	vViewDir = uCameraPosition - vPosition;
-
-	if (useNormalTexture)
-	{
-		vNormal = vec3(uWorldMatrix * vec4(texture(uNormal, vTexCoord).rgb, 0.0f));
-	}
-	else
-	{
-		vNormal = vec3(uWorldMatrix * vec4(aNormal, 0.0));
-	}
-	//vNormal = vec3(uWorldMatrix * vec4(aNormal, 0.0));
+	vNormal = vec3(uWorldMatrix * vec4(aNormal, 0.0));
+	vWorldMatrix = uWorldMatrix;
 
 	gl_Position = uWorldViewProjectionMatrix * vec4(aPosition, 1.0f);
 }
@@ -84,15 +74,19 @@ in vec2 vTexCoord; // Texture Coords
 in vec3 vPosition; // World Position
 in vec3 vNormal; // Normal
 in vec3 vViewDir; // View Direction // Camera Position
+in mat4 vWorldMatrix;
 
 uniform bool useEmissive;
+uniform bool useNormalTexture;
+
+uniform bool usePBR;
 
 // Samplers
 uniform sampler2D uTexture; // Albedo sampler
 uniform sampler2D uMetallic; // Metallic sampler
 uniform sampler2D uRoughness; // Roughness sampler
 uniform sampler2D uAO; // Ambient Occlusion sampler
-//uniform sampler2D uNormal; // Normal sampler
+uniform sampler2D uNormal; // Normal sampler
 uniform sampler2D uEmissive; // Emissive sampler
 
 // Material parameters
@@ -102,7 +96,34 @@ float roughness;
 float ao;
 vec3 emissive;
 
-// Lightning Calculation methods
+vec3 normal;
+
+// SAMPLE TEXTURES
+void SamplerAllTextures()
+{
+	albedo = texture(uTexture, vTexCoord).rgb;
+	
+	if (usePBR)
+	{
+		metallic = texture(uMetallic, vTexCoord).r;
+		roughness = texture(uRoughness, vTexCoord).r;
+		ao = texture(uAO, vTexCoord).r;
+		emissive = texture(uEmissive, vTexCoord).rgb;
+
+		// Sample normal texture if there is one
+		if(useNormalTexture)
+		{
+			normal = texture(uNormal, vTexCoord).rgb;
+			normal = vec3(vWorldMatrix * vec4(normal, 0.0f));
+		}
+		else
+		{
+			normal = vNormal;
+		}
+	}
+}
+
+// PBR METHOD
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
 	float a = roughness * roughness;
@@ -118,6 +139,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
 	return num / denom;
 }
 
+// PBR METHOD
 float GeometrySchlickGGX(float NdotV, float roughness)
 {
 	float r = (roughness + 1.0);
@@ -129,6 +151,7 @@ float GeometrySchlickGGX(float NdotV, float roughness)
 	return num / denom;
 }
 
+// PBR METHOD
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 {
 	float NdotV = max(dot(N, V), 0.0);
@@ -140,28 +163,18 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 	return ggx1 * ggx2;
 }
 
+// PBR METHOD
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
-	return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+	//return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-void SamplerAllTextures()
+// MAIN PBR
+void CalculatePBRLightning()
 {
-	albedo = texture(uTexture, vTexCoord).rgb;
-	metallic = texture(uMetallic, vTexCoord).r;
-    roughness = texture(uRoughness, vTexCoord).r;
-    ao = texture(uAO, vTexCoord).r;
-	emissive = texture(uEmissive, vTexCoord).rgb;
-
-
-}
-
-void main()
-{
-	SamplerAllTextures();
-
-	vec3 N = normalize(vNormal); //vNormal
-	vec3 V = normalize(vViewDir - vPosition); // Podria estar malament
+	vec3 N = normalize(normal); //vNormal
+	vec3 V = normalize(vViewDir - vPosition); 
 
 	vec3 F0 = vec3(0.04);
 	F0 = mix(F0, albedo.rgb, metallic);
@@ -218,6 +231,81 @@ void main()
 	color = pow(color, vec3(1.0/2.2));
 
 	oColor = vec4(color, 1.0f);	
+}
+
+// OLD LIGHTNING (NON PBR METHOD)
+void CalculateBlitVars(in Light light, out vec3 ambient, out vec3 diffuse, out vec3 specular)
+{
+	vec3 lightDir = normalize(light.direction);
+
+	float ambientStrength = 0.2;
+	ambient = ambientStrength * light.color;
+
+	float diff = max(dot(vNormal, lightDir), 0.0f);
+	diffuse = diff * light.color;
+
+	float specularStrength = 0.1f;
+	vec3 reflectDir = reflect(-lightDir, vNormal);
+	vec3 normalViewDir = normalize(vViewDir);
+	float spec = pow(max(dot(normalViewDir, reflectDir), 0.0f), 32);
+	specular = specularStrength * spec * light.color;
+}
+
+// MAIN OLD LIGHTNING (NON PBR)
+void CalculateBasicLightning()
+{
+	vec4 textureColor = texture(uTexture, vTexCoord);
+	vec4 finalColor = vec4(0.0f);
+	for (int i = 0; i < uLightCount; ++i)
+	{
+		vec3 lightResult = vec3(0.0f);
+		vec3 ambient = vec3(0.0f);
+		vec3 diffuse = vec3(0.0f);
+		vec3 specular = vec3(0.0f);
+
+		if (uLight[i].type == 0)
+		{
+			//Directional
+			Light light = uLight[i];
+
+			CalculateBlitVars(light, ambient, diffuse, specular);
+
+			lightResult = ambient + diffuse + specular;
+			finalColor += vec4(lightResult, 1.0) * textureColor * (light.intensity/2);
+		}
+		else
+		{
+			Light light = uLight[i];
+
+			float constant = 1.0f;
+			float linear = 0.09f;
+			float quadratic = 0.032f;
+			float distance = length(light.position - vPosition);
+			float attenuation = 1.0f / (constant + linear * distance + quadratic * (distance*distance));
+
+			CalculateBlitVars(light, ambient, diffuse, specular);
+			lightResult = (ambient * attenuation) + (diffuse * attenuation) + (specular * attenuation);
+			finalColor += vec4(lightResult, 1.0) * textureColor * (light.intensity/2);
+		}
+	}
+
+	oColor = finalColor;
+}
+
+void main()
+{
+	SamplerAllTextures();
+	
+	if (usePBR)
+	{
+		// PBR Lightning
+		CalculatePBRLightning();
+	}
+	else
+	{
+		// Basic Lightning
+		CalculateBasicLightning();
+	}
 }
 
 #endif

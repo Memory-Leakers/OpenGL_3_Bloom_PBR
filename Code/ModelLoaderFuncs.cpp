@@ -19,7 +19,7 @@ namespace ModelLoader
         }
         else
         {
-            ELOG("Could not open file %s", filename);
+            ELOG("Could not open file %s: %s", filename, stbi_failure_reason());
         }
         return img;
     }

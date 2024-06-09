@@ -1,0 +1,193 @@
+# Blender 3.5.0 MTL File: 'None'
+# www.blender.org
+
+newmtl body
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_body_BaseColor.png
+map_Ks textures/plane_car_body_Metallic.png
+map_Ns textures/plane_car_body_Roughness.png
+map_Bump textures/plane_car_body_Normal.png
+
+newmtl clocks
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/gauges.png
+
+newmtl disc_brake
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_disc_brake_BaseColor.png
+map_Ks textures/plane_car_disc_brake_Metallic.png
+# map_Ns textures/plane_car_disc_brake_Roughness.png
+map_Bump textures/plane_car_disc_brake_Normal.png
+
+newmtl engine
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/engine_base_color.png
+map_Ks textures/engine_base_metalic.png
+map_Ns textures/engine_base_roughnes.png
+map_Bump textures/engine_base_normal.png
+
+newmtl exhaust
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_exhaust_BaseColor.png
+map_Ks textures/plane_car_exhaust_Metallic.png
+map_Ns textures/plane_car_exhaust_Roughness.png
+map_Bump textures/plane_car_exhaust_Normal.png
+
+newmtl front_suspension
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_front_suspension_BaseColor.png
+map_Ks textures/plane_car_front_suspension_Metallic.png
+map_Ns textures/plane_car_front_suspension_Roughness.png
+map_Bump textures/plane_car_front_suspension_Normal.png
+
+newmtl front_wheel
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_front_wheel_BaseColor.png
+map_Ks textures/plane_car_front_wheel_Metallic.png
+map_Ns textures/plane_car_front_wheel_Roughness.png
+map_Bump textures/plane_car_front_wheel_Normal.png
+
+newmtl glass
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Ks textures/plane_car_glass_Metallic.png
+map_Ns textures/plane_car_glass_Roughness.png
+map_Bump textures/plane_car_glass_Normal.png
+
+newmtl glass_cover_clocks
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_glass_cover_clocks_BaseColor.png
+# map_Ks textures/plane_car_glass_cover_clocks_Metallic.png
+map_Ns textures/plane_car_glass_cover_clocks_Roughness.png
+map_Bump textures/plane_car_glass_cover_clocks_Normal.png
+
+newmtl interior
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_interior_BaseColor.png
+map_Ks textures/plane_car_interior_Metallic.png
+map_Ns textures/plane_car_interior_Roughness.png
+map_Bump textures/plane_car_interior_Normal.png
+
+newmtl rear_suspension
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_rear_suspension_BaseColor.png
+map_Ks textures/plane_car_rear_suspension_Metallic.png
+map_Ns textures/plane_car_rear_suspension_Roughness.png
+map_Bump textures/plane_car_rear_suspension_Normal.png
+
+newmtl rear_wheel
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_rear_wheel_BaseColor.png
+map_Ks textures/plane_car_rear_wheel_Metallic.png
+map_Ns textures/plane_car_rear_wheel_Roughness.png
+map_Bump textures/plane_car_rear_wheel_Normal.png
+
+newmtl shawel
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_shawel_BaseColor.png
+map_Ks textures/plane_car_shawel_Metallic.png
+map_Ns textures/plane_car_shawel_Roughness.png
+map_Bump textures/plane_car_shawel_Normal.png
+
+newmtl spare_wheel
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures/plane_car_spare_wheel_BaseColor.png
+map_Ks textures/plane_car_spare_wheel_Metallic.png
+map_Ns textures/plane_car_spare_wheel_Roughness.png
+map_Bump textures/plane_car_spare_wheel_Normal.png
