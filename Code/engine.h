@@ -77,7 +77,7 @@ struct App
 
     void PassBlur(FrameBuffer& fb,vec2 viewportSize, GLenum colorAttachment, GLuint inputTexture, GLuint lod, vec2 direction);
 
-    void PassBloom(GLenum colorAttachment, GLuint inputTexture, GLuint maxLod);
+    void PassBloom(GLenum colorAttachment, GLuint inputTexture,  GLuint inputTexture2, GLuint maxLod);
 
     // Loop
     f32  deltaTime;

@@ -1072,7 +1072,6 @@ void App::PassBloom(GLenum colorAttachment, GLuint inputTexture, GLuint inputTex
 	glBlendFunc(GL_ONE, GL_ZERO);
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
-
 }
 
 void Camera::Init(ivec2 displaySize)

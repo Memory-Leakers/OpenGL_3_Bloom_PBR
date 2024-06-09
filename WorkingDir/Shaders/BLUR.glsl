@@ -34,16 +34,19 @@ uniform vec2 direction;
 uniform int inputLod;
 
 in vec2 vTexCoord;
-layout(location = 0) out vec4 oColor;
+out vec4 oColor;
 
 void main()
 {
+    //oColor = texture2D(colorMap, vTexCoord);
+    //return;
+
+    oColor = vec4(0.0);
+
     vec2 texSize = textureSize(colorMap, inputLod);
     vec2 texelSize = 1.0/texSize;
     vec2 margin1 = texelSize * 0.5;
     vec2 margin2 = vec2(1.0) - margin1;
-
-	oColor = vec4(0.0);
 
     vec2 directionFragCoord = gl_FragCoord.xy * direction;
     int coord = int(directionFragCoord.x + directionFragCoord.y);
@@ -63,6 +66,10 @@ void main()
     }
 
     oColor /= weight;
+
+    
+
+
 }
 
 #endif
