@@ -270,7 +270,7 @@ void Init(App* app)
 
 	u32 CarModelIndex = ModelLoader::LoadModel(app, "Models/Car/Car.obj");
 	u32 Car2ModelIndex = ModelLoader::LoadModel(app, "Models/Car2/Plane Car.obj");
-	u32 RavineModelIndex = ModelLoader::LoadModel(app, "Models/Ravine/canyondesert-asset-library.obj");
+	//u32 RavineModelIndex = ModelLoader::LoadModel(app, "Models/Ravine/canyondesert-asset-library.obj");
 	//u32 CathedralModelIndex = ModelLoader::LoadModel(app, "Models/Cathedral/Cathedral.obj");
 
 	//u32 StreetIndex = ModelLoader::LoadModel(app, "Models/Street/PGA-Street.obj");
@@ -294,7 +294,7 @@ void Init(App* app)
 
 	app->entities.push_back({ vec3(-1.0, -3.65, 0.0), vec3(0.01), CarModelIndex, 0, 0 });
 	app->entities.push_back({ vec3(1.0, -3.65, 0.0), vec3(0.5), Car2ModelIndex, 0, 0 });
-	app->entities.push_back({ vec3(0.0, -1.0, 0.0), vec3(0.50), RavineModelIndex, 0, 0 });
+	//app->entities.push_back({ vec3(0.0, -1.0, 0.0), vec3(0.50), RavineModelIndex, 0, 0 });
 	//app->entities.push_back({ vec3(0.0, 0.0, 0.0), vec3(1.00), StreetIndex, 0, 0 });
 
 	//app->entities.push_back({ vec3(0, -1.55, 0.0), vec3(5, 5, 5), GroundModelIndex, 0, 0 });
