@@ -11,7 +11,6 @@ void main()
 {
 	//vTexCoord = aTexCoord;
 
-    // 顶点坐标
     vec2 vertices[4] = vec2[](
         vec2(-1.0, -1.0),
         vec2(1.0, -1.0),
@@ -19,10 +18,9 @@ void main()
         vec2(1.0, 1.0)
     );
 
-    // 通过顶点索引获取顶点坐标
     vec2 position = vertices[gl_VertexID];
 
-    vTexCoord = (position + 1.0) * 2;
+    vTexCoord = (position + 1.0);
 
 	gl_Position = vec4(vTexCoord, 0.0, 1.0);
 }
@@ -32,15 +30,13 @@ void main()
 uniform sampler2D colorMap;
 uniform vec2 direction;
 uniform int inputLod;
+uniform int kernelRadius;
 
 in vec2 vTexCoord;
-out vec4 oColor;
+layout(location = 0) out vec4 oColor;
 
 void main()
 {
-    //oColor = texture2D(colorMap, vTexCoord);
-    //return;
-
     oColor = vec4(0.0);
 
     vec2 texSize = textureSize(colorMap, inputLod);
@@ -52,7 +48,6 @@ void main()
     int coord = int(directionFragCoord.x + directionFragCoord.y);
     vec2 directionTexSize = texSize * direction;
     int size = int(directionTexSize.x + directionTexSize.y);
-    int kernelRadius = 24;
     int kernelBegin = -min(kernelRadius, coord);
     int kernelEnd = min(kernelRadius, size - coord);
     float weight = 0.0;
@@ -66,10 +61,6 @@ void main()
     }
 
     oColor /= weight;
-
-    
-
-
 }
 
 #endif

@@ -25,8 +25,10 @@ const u16 indices[] =
 struct Bloom
 {
     bool active = false;
-    bool test = false;
+    bool showBrightest = false;
+    int kernerRadius = 8;
     float threshold = 1.0;
+    float lodIntensity[5] = { 1.0 };
     GLuint rtBright; // For blitting brightest pixels and vertical blur
     GLuint rtBloomH; // For first pass horizontal blur
     std::vector<FrameBuffer>fbBloom;
@@ -77,7 +79,7 @@ struct App
 
     void PassBlur(FrameBuffer& fb,vec2 viewportSize, GLenum colorAttachment, GLuint inputTexture, GLuint lod, vec2 direction);
 
-    void PassBloom(GLenum colorAttachment, GLuint inputTexture,  GLuint inputTexture2, GLuint maxLod);
+    void PassBloom(GLenum colorAttachment, GLuint inputTexture, GLuint maxLod);
 
     // Loop
     f32  deltaTime;

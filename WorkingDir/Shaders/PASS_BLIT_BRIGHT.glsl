@@ -22,7 +22,7 @@ void main()
     // get corresponding position
     vec2 position = vertices[gl_VertexID];
 
-    vTexCoord = (position + 1.0) * 2;
+    vTexCoord = (position + 1.0);
 
 	gl_Position = vec4(vTexCoord, 0.0, 1.0);
 }
